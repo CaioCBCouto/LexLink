@@ -1,0 +1,125 @@
+1 - SELECT
+  "dim_processo__via__processo_id"."prioridade" AS "dim_processo__via__processo_id__prioridade",
+  COUNT(*) AS "count"
+FROM
+  "public"."fato_processo_juridico"
+ 
+LEFT JOIN "public"."dim_processo" AS "dim_processo__via__processo_id" ON "public"."fato_processo_juridico"."processo_id" = "dim_processo__via__processo_id"."processo_id"
+WHERE
+  "public"."fato_processo_juridico"."empresa_id" = 4
+GROUP BY
+  "dim_processo__via__processo_id"."prioridade"
+ORDER BY
+  "dim_processo__via__processo_id"."prioridade" ASC
+
+2 - SELECT 
+    f.numero_processo,
+    f.custas_judiciais,
+    p.custos_medios
+FROM 
+    fato_processo_juridico f
+JOIN 
+    dim_processo p
+ON 
+    f.processo_id = p.processo_id
+WHERE 
+    f.empresa_id = 4;
+
+3 - SELECT
+  "public"."fato_processo_juridico"."resultado" AS "resultado",
+  COUNT(*) AS "count"
+FROM
+  "public"."fato_processo_juridico"
+WHERE
+  "public"."fato_processo_juridico"."empresa_id" = 4
+GROUP BY
+  "public"."fato_processo_juridico"."resultado"
+ORDER BY
+  "public"."fato_processo_juridico"."resultado" ASC
+
+4 - SELECT
+  "dim_tribunal__via__tribunal_id"."regiao" AS "dim_tribunal__via__tribunal_id__regiao",
+  COUNT(*) AS "count"
+FROM
+  "public"."fato_processo_juridico"
+ 
+LEFT JOIN "public"."dim_tribunal" AS "dim_tribunal__via__tribunal_id" ON "public"."fato_processo_juridico"."tribunal_id" = "dim_tribunal__via__tribunal_id"."tribunal_id"
+GROUP BY
+  "dim_tribunal__via__tribunal_id"."regiao"
+ORDER BY
+  "dim_tribunal__via__tribunal_id"."regiao" ASC
+
+5 - SELECT
+  "public"."fato_processo_juridico"."resultado" AS "resultado",
+  COUNT(*) AS "count"
+FROM
+  "public"."fato_processo_juridico"
+WHERE
+  (
+    "public"."fato_processo_juridico"."resultado" = 'Absolvição'
+  )
+ 
+    OR (
+    "public"."fato_processo_juridico"."resultado" = 'Acordo'
+  )
+  OR (
+    "public"."fato_processo_juridico"."resultado" = 'Arquivamento'
+  )
+  OR (
+    "public"."fato_processo_juridico"."resultado" = 'Condenação'
+  )
+  OR (
+    "public"."fato_processo_juridico"."resultado" = 'Multa'
+  )
+GROUP BY
+  "public"."fato_processo_juridico"."resultado"
+ORDER BY
+  "public"."fato_processo_juridico"."resultado" ASC
+
+6 - SELECT
+  "dim_advogado__via__advogado_id"."nome_advogado" AS "dim_advogado__via__advogado_id__nome_advogado",
+  COUNT(*) AS "count"
+FROM
+  "public"."fato_processo_juridico"
+ 
+LEFT JOIN "public"."dim_advogado" AS "dim_advogado__via__advogado_id" ON "public"."fato_processo_juridico"."advogado_id" = "dim_advogado__via__advogado_id"."advogado_id"
+WHERE
+  (
+    "dim_advogado__via__advogado_id"."nome_advogado" = 'Dr. Lima'
+  )
+ 
+    OR (
+    "dim_advogado__via__advogado_id"."nome_advogado" = 'Dr. Oliveira'
+  )
+  OR (
+    "dim_advogado__via__advogado_id"."nome_advogado" = 'Dr. Pereira'
+  )
+  OR (
+    "dim_advogado__via__advogado_id"."nome_advogado" = 'Dr. Santos'
+  )
+  OR (
+    "dim_advogado__via__advogado_id"."nome_advogado" = 'Dr. Silva'
+  )
+  OR (
+    "dim_advogado__via__advogado_id"."nome_advogado" = 'Dr. Souza'
+  )
+GROUP BY
+  "dim_advogado__via__advogado_id"."nome_advogado"
+ORDER BY
+  "dim_advogado__via__advogado_id"."nome_advogado" ASC
+
+7 - SELECT dp.tipo_de_processo, AVG(dp.tempo_medio_resolucao_mes) AS tempo_medio_resolucao
+FROM dim_processo dp
+GROUP BY dp.tipo_de_processo
+ORDER BY tempo_medio_resolucao DESC;
+
+8 - SELECT dp.tipo_de_processo, dp.taxa_de_sucesso
+FROM dim_processo dp
+ORDER BY dp.taxa_de_sucesso DESC;
+
+9 - SELECT da.nome_advogado, dp.tipo_de_processo, SUM(fp.valor_envolvido) AS valor_total
+FROM fato_processo_juridico fp
+JOIN dim_processo dp ON fp.processo_id = dp.processo_id
+JOIN dim_advogado da ON fp.advogado_id = da.advogado_id
+GROUP BY da.nome_advogado, dp.tipo_de_processo
+ORDER BY valor_total DESC;
