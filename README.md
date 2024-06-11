@@ -6,7 +6,7 @@ Python 3 instalado na máquina que deseja-se executar, Docker e um navegador.
 
 ## Como executar o código:
 Existem duas opções: utilizando o Makefile ou por meio de comandos diretos. <br/> 
-Caso a preferência seja o uso da Makefile, a aplicação será executada em três comandos: <br/>"make create-env", em que um ambiente virtual (visando a compartimentalização das bibliotecas e pacotes);<br/> "make activate-env", que permitirá o uso do ambiente virtual, em que as instalações de pacotes e bibliotecas serão feitas lá, e não na máquina local;<br/> E por fim "make install-app", onde o arquivo install.py será executado. Esse arquivo possui todas as instruções necessárias para que a aplicação seja executada por completo.
+Caso a preferência seja o uso da Makefile, a aplicação será executada em três comandos: <br/>"make create-env", em que um ambiente virtual (visando a compartimentalização das bibliotecas e pacotes);<br/> "make activate-env", que permitirá o uso do ambiente virtual, em que as instalações de pacotes e bibliotecas serão feitas lá, e não na máquina local;<br/> E, por fim, "make install-app", onde o arquivo install.py será executado. Esse arquivo possui todas as instruções necessárias para que a aplicação seja executada por completo.
 <hr>
 A segunda opção envolve o uso dos comandos diretos, que são os mesmos que a Makefile executará. São esses: "python -m venv env", "env\Scripts\activate" e "python install.py". A execução desses comandos possui a mesma lógica de executá-los por meio da Makefile.
 
