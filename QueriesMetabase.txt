@@ -117,9 +117,9 @@ ORDER BY tempo_medio_resolucao DESC;
 FROM dim_processo dp
 ORDER BY dp.taxa_de_sucesso DESC;
 
-9 - SELECT da.nome_advogado, dp.tipo_de_processo, SUM(fp.valor_envolvido) AS valor_total
+9 - SELECT da.nome_advogado, SUM(fp.valor_envolvido) AS valor_total
 FROM fato_processo_juridico fp
 JOIN dim_processo dp ON fp.processo_id = dp.processo_id
 JOIN dim_advogado da ON fp.advogado_id = da.advogado_id
-GROUP BY da.nome_advogado, dp.tipo_de_processo
+GROUP BY da.nome_advogado
 ORDER BY valor_total DESC;
