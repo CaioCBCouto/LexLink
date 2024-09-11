@@ -1,14 +1,12 @@
 import psycopg2
 import os
 
-# Database connection details
 DB_USER = 'postgres'
 DB_PASSWORD = 'root'
 DB_HOST = 'localhost'
 DB_NAME = 'analise_juridica'
 DB_PORT = 54320
 
-# Function to connect to the PostgreSQL database
 def get_connection():
     try:
         conn = psycopg2.connect(user=DB_USER, password=DB_PASSWORD, host=DB_HOST, database=DB_NAME, port=DB_PORT)
@@ -17,12 +15,10 @@ def get_connection():
         print(f"Database connection failed: {e}")
         return None
 
-# Function to create tables in the PostgreSQL database
 def create_tables(conn):
     if conn is not None:
         cursor = conn.cursor()
         try:
-            # Iterate over all files in the Tables directory
             for filename in os.listdir("Tables"):
                 if filename.endswith(".sql"):
                     filepath = os.path.join("Tables", filename)
@@ -37,7 +33,6 @@ def create_tables(conn):
         finally:
             cursor.close()
 
-# Function to insert data into the dim_empresa table
 def insert_empresa(conn, empresas):
     if conn is not None:
         cursor = conn.cursor()
@@ -60,7 +55,6 @@ def insert_empresa(conn, empresas):
         finally:
             cursor.close()
 
-# Function to insert data into the dim_processo table
 def insert_processo(conn, processos):
     if conn is not None:
         cursor = conn.cursor()
@@ -86,7 +80,6 @@ def insert_processo(conn, processos):
         finally:
             cursor.close()
 
-# Function to insert data into the dim_advogado table
 def insert_advogado(conn, advogados):
     if conn is not None:
         cursor = conn.cursor()
@@ -109,7 +102,6 @@ def insert_advogado(conn, advogados):
         finally:
             cursor.close()
 
-# Function to insert data into the dim_tribunal table
 def insert_tribunal(conn, tribunais):
     if conn is not None:
         cursor = conn.cursor()
@@ -132,7 +124,6 @@ def insert_tribunal(conn, tribunais):
         finally:
             cursor.close()
 
-# Function to insert data into the dim_departamento table
 def insert_departamento(conn, departamentos):
     if conn is not None:
         cursor = conn.cursor()
@@ -189,7 +180,6 @@ def insert_data(conn, data, column_names, batch_size=100000):
         finally:
             cursor.close()
 
-# Function to load data from PostgreSQL table
 def load_data_from_postgres(table_name):
     print(f"Loading data from table {table_name}...")
     conn = get_connection()
@@ -203,21 +193,20 @@ def load_data_from_postgres(table_name):
             return data, column_names
         except psycopg2.Error as e:
             print(f"An error occurred while accessing the database: {e}")
-            return [], []  # Return empty lists in case of error
+            return [], []
         finally:
             conn.close()
     else:
         print("Failed to connect to the database.")
-        return [], []  # Return empty lists if connection could not be established
+        return [], []
 
-# Main function to manage the database setup
 def main():
     conn = get_connection()
     if conn:
         create_tables(conn)
 
-        # Load data from processos_juridicos_info
         info_data, info_columns = load_data_from_postgres('processos_juridicos_info')
+        
         processos = [(row[info_columns.index('Tipo de Processo')],
                       row[info_columns.index('Prioridade')],
                       row[info_columns.index('Palavras-Chave')],
@@ -226,11 +215,9 @@ def main():
                       row[info_columns.index('Custos Médios')],
                       row[info_columns.index('Número Médio de Testemunhas')],
                       row[info_columns.index('Complexidade Média')]) for row in info_data]
-        # remove R$ from 'Custos Médios' column
         processos = [(row[0], row[1], row[2], row[3], row[4], row[5].replace('R$ ', '').replace('.', '').replace(',', '.'), row[6], row[7]) for row in processos]
         processo_ids = insert_processo(conn, processos)
 
-        # Load data from processos_juridicos_completos
         completos_data, completos_columns = load_data_from_postgres('processos_juridicos_completos')
         empresas = set(row[completos_columns.index('Nome da Empresa')] for row in completos_data)
         empresa_ids = insert_empresa(conn, list(empresas))
@@ -265,8 +252,7 @@ def main():
                 ))
             except KeyError as e:
                 print(f"Error inserting row: {e}")
-                # Handle the error appropriately (e.g., log it, skip the row, etc.)
-        # remove R$ from 'Valor Envolvido' and 'Custas Judiciais' column
+
         fato_data = [(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9].replace('R$ ', '').replace('.', '').replace(',', '.'), row[10], row[11].replace('R$ ', '').replace('.', '').replace(',', '.'), row[12], row[13]) for row in fato_data]
         
         insert_data(conn, fato_data, [
